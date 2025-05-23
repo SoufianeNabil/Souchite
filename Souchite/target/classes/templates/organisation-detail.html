@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${organisation.nom + ' - Souchite'}">Détail de l'organisation - Souchite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Souchite</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/actions">Actions de Charité</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/organisations">Organisations</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Connexion</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register">Inscription</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8">
+                <h1 th:text="${organisation.nom}">Nom de l'organisation</h1>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Informations</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>Adresse:</strong> <span th:text="${organisation.adresse}">Adresse</span></li>
+                            <li><strong>NIF:</strong> <span th:text="${organisation.nif}">NIF</span></li>
+                            <li><strong>Contact:</strong> <span th:text="${organisation.contact}">Contact</span></li>
+                            <li><strong>Statut:</strong> 
+                                <span th:if="${organisation.active}" class="badge bg-success">Active</span>
+                                <span th:unless="${organisation.active}" class="badge bg-warning">En attente</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Actions de charité</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3" th:each="action : ${organisation.actionsCharite}">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title" th:text="${action.titre}">Titre de l'action</h6>
+                                        <p class="card-text">
+                                            <small class="text-muted" th:text="${action.categorie}">Catégorie</small>
+                                        </p>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 th:style="'width: ' + ${action.montantActuel / action.objectifMontant * 100} + '%'"
+                                                 th:text="${#numbers.formatDecimal(action.montantActuel / action.objectifMontant * 100, 1, 1)} + '%'">
+                                            </div>
+                                        </div>
+                                        <a th:href="@{/actions/{id}(id=${action.id})}" class="btn btn-sm btn-primary">Voir les détails</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Contact</h5>
+                        <p class="card-text">
+                            <strong>Email:</strong> <span th:text="${organisation.user.email}">email@example.com</span><br>
+                            <strong>Téléphone:</strong> <span th:text="${organisation.contact}">Téléphone</span>
+                        </p>
+                        <a href="mailto:" th:href="@{'mailto:' + ${organisation.user.email}}" class="btn btn-primary">Envoyer un email</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light mt-5 py-3">
+        <div class="container text-center">
+            <p>&copy; 2024 Souchite. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actions Caritatives - Souchite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Souchite</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/actions">Actions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/organisations">Organisations</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                        <a class="nav-link" href="/actions/new" class="btn btn-light">
+                            <i class="fas fa-plus"></i> Nouvelle Action
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Actions Caritatives</h2>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Rechercher une action..." id="searchInput">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col" th:each="action : ${actions}">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${action.titre}">Titre de l'action</h5>
+                        <p class="card-text" th:text="${action.description}">Description de l'action</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span th:text="${action.lieu}">Lieu</span>
+                            </small>
+                        </p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i>
+                                <span th:text="${#temporals.format(action.dateDebut, 'dd/MM/yyyy')}">Date</span>
+                            </small>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a th:href="@{/actions/{id}(id=${action.id})}" class="btn btn-primary btn-sm">
+                                Voir détails
+                            </a>
+                            <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                                <a th:href="@{/actions/{id}/edit(id=${action.id})}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-danger btn-sm" 
+                                        th:data-id="${action.id}"
+                                        onclick="deleteAction(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function deleteAction(button) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette action ?')) {
+                const id = button.getAttribute('data-id');
+                fetch(`/actions/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        button.closest('.col').remove();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html> 
